@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>观赏站点</title>
+    <link rel="icon" type="image/jpeg" href="https://img.tuiguang09.cn/20260320/card/23.jpg">
+    <link rel="shortcut icon" type="image/jpeg" href="https://img.tuiguang09.cn/20260320/card/23.jpg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #1a1a22;
+            background-image: url('https://img.tuiguang09.cn/20260320/card/21.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: scroll;
+            min-height: 100vh;
+            color: #ffffff;
+            padding: 20px 15px;
+            max-width: 720px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+        /* 手机端背景图兜底方案：用固定定位的层铺底，兼容 iOS/微信 */
+        html { background: #1a1a22; }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('https://th.bing.com/th/id/OIP.-lfiLU0SedCHTbLCGwVERgAAAA?w=160&h=349&c=7&r=0&o=7&pid=1.7&rm=3');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -1;
+        }
+        .cover-box img {
+            width:100%;
+            display:block;
+            object-fit:cover;
+        }
+        /* 头像+昵称区域 */
+        .user-info{
+            display:flex;
+            align-items:center;
+            gap:14px;
+            margin-bottom:30px;
+        }
+        .avatar{
+            width:64px;
+            height:64px;
+            border-radius:50%;
+            overflow:hidden;
+            border:2px solid #4488ff;
+        }
+        .avatar img{
+            width:100%;
+            height:100%;
+            object-fit:cover;
+        }
+        .username{
+            font-size:19px;
+            font-weight:bold;
+        }
+        /* 4个卡片容器 */
+        .card-wrap{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:36px;
+            margin-bottom:10px;
+        }
+        .card-item{
+            background:#272733;
+            border-radius:12px;
+            padding:22px 8px;
+            text-align:center;
+            border:1px solid #383848;
+        }
+        .card-item a{
+            color:#B5A642;
+            text-decoration:none;
+            font-size:16px;
+            display:block;
+        }
+        .card-item:hover{
+            border-color:#4488ff;
+        }
+        /* 底部提示文字 */
+        .footer-tip{
+            margin-top:0px;
+            margin-bottom:auto;
+            text-align:center;
+            font-size:18px;
+            color:#000000;
+            line-height:1.2;
+        }
+        /* 微信打开自动弹窗遮罩 */
+        .wechat-mask{
+            display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,0.88);
+            z-index:99999;
+            padding:20px;
+        }
+        .wechat-mask.show{
+            display:block;
+        }
+        /* 右上角引导箭头 */
+        .wechat-arrow{
+            position:absolute;
+            top:0;
+            right:0;
+            width:200px;
+            height:130px;
+            z-index:1;
+        }
+        /* 搜索框样式 */
+        .wechat-search-box{
+            margin:30px auto 0;
+            max-width:320px;
+            position:relative;
+        }
+        .wechat-search-box .search-icon{
+            position:absolute;
+            left:14px;
+            top:50%;
+            transform:translateY(-50%);
+            width:18px;
+            height:18px;
+            color:#999;
+        }
+        .wechat-search-box input{
+            width:100%;
+            padding:12px 16px 12px 42px;
+            border-radius:24px;
+            border:1px solid #555;
+            background:#1a1a22;
+            color:#eee;
+            font-size:14px;
+            outline:none;
+            user-select:all;
+        }
+        .wechat-search-box input::selection{
+            background:#4488ff;
+        }
+        /* 搜索框固定在按钮上方紧贴 */
+        .wechat-search-fixed{
+            position:absolute;
+            bottom:158px;
+            left:50%;
+            transform:translateX(-50%);
+            width:86%;
+            max-width:320px;
+            margin:0;
+        }
+        /* 第一套搜索框：正常文档流，紧贴文字下方 */
+        .wechat-top-group{
+            text-align:center;
+            margin-top:18px;
+            position:relative;
+            z-index:2;
+        }
+        .wechat-search-top{
+            margin:0 auto;
+            max-width:320px;
+            position:relative;
+            width:86%;
+        }
+        /* 第一套按钮：完全独立样式，紧贴搜索框下方 */
+        .wechat-copy-btn-top{
+            background:#ffdd70;
+            border:none;
+            color:#333;
+            padding:12px 30px;
+            border-radius:8px;
+            font-size:16px;
+            font-weight:bold;
+            margin-top:10px;
+            box-shadow:0 4px 16px rgba(255,221,112,0.4);
+        }
+        .wechat-copy-btn-top:active{
+            transform:scale(0.96);
+        }
+        .wechat-longpress-tip{
+            position:absolute;
+            bottom:134px;
+            left:50%;
+            transform:translateX(-50%);
+            font-size:12px;
+            color:#999;
+            margin:0;
+            white-space:nowrap;
+        }
+        /* 调整按钮位置，给搜索框腾空间（仅第二套固定按钮） */
+        #wechatOpenBtn{
+            bottom:78px;
+        }
+        .wechat-close{
+            bottom:28px;
+        }
+        .wechat-tip-box{
+            margin-top:120px;
+            text-align:center;
+            color:#fff;
+        }
+        .wechat-tip-box h2{
+            font-size:22px;
+            margin-bottom:16px;
+            color:#ffdd70;
+        }
+        .wechat-tip-box p{
+            font-size:16px;
+            line-height:2;
+            color:#eee;
+        }
+        .wechat-tip-box .step{
+            display:inline-block;
+            background:#4488ff;
+            color:#fff;
+            padding:4px 14px;
+            border-radius:20px;
+            margin:6px 4px;
+            font-size:14px;
+        }
+        .wechat-close{
+            position:absolute;
+            bottom:40px;
+            left:50%;
+            transform:translateX(-50%);
+            background:transparent;
+            border:1px solid #888;
+            color:#aaa;
+            padding:10px 30px;
+            border-radius:8px;
+            font-size:14px;
+        }
+        .wechat-open-btn{
+            position:absolute;
+            bottom:100px;
+            left:50%;
+            transform:translateX(-50%);
+            background:#ffdd70;
+            border:none;
+            color:#333;
+            padding:14px 40px;
+            border-radius:8px;
+            font-size:17px;
+            font-weight:bold;
+            box-shadow:0 4px 16px rgba(255,221,112,0.4);
+        }
+        .wechat-open-btn:active{
+            transform:translateX(-50%) scale(0.96);
+        }
+        /* ========== 进入加载页 ========== */
+        .loading-mask{
+            position:fixed;
+            inset:0;
+            background:#0a0a12;
+            z-index:999999;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+            transition:opacity 0.6s ease;
+        }
+        .loading-mask.hide{
+            opacity:0;
+            pointer-events:none;
+        }
+        /* 背景网格 */
+        .loading-mask::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size:40px 40px;
+        }
+        .loading-card{
+            position:relative;
+            width:100%;
+            max-width:360px;
+            background:rgba(20,20,30,0.95);
+            border-radius:24px;
+            padding:0 30px 36px;
+            text-align:center;
+            overflow:hidden;
+            border:1px solid rgba(255,255,255,0.06);
+        }
+        /* 卡片顶部渐变条 */
+        .loading-card::before{
+            content:"";
+            position:absolute;
+            top:0;
+            left:0;
+            right:0;
+            height:4px;
+            background:linear-gradient(90deg,#4ade80,#facc15,#fb923c,#f472b6,#a78bfa);
+        }
+        /* 烟花图标 */
+        .loading-icon{
+            width:150px;
+            height:150px;
+            margin:36px auto 24px;
+            border-radius:32px;
+            background:radial-gradient(circle at 50% 40%, #2a2a45 0%, #141428 70%, #0d0d1a 100%);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border:1px solid rgba(255,182,193,0.2);
+            box-shadow:0 8px 32px rgba(255,182,193,0.15), inset 0 2px 8px rgba(255,255,255,0.05);
+            position:relative;
+            overflow:hidden;
+        }
+        /* 背景星星点缀 */
+        .loading-icon::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            background-image:
+                radial-gradient(2px 2px at 20% 30%, rgba(255,255,255,0.6), transparent),
+                radial-gradient(1.5px 1.5px at 75% 20%, rgba(255,192,203,0.7), transparent),
+                radial-gradient(2px 2px at 85% 60%, rgba(255,255,255,0.5), transparent),
+                radial-gradient(1px 1px at 15% 70%, rgba(255,192,203,0.6), transparent),
+                radial-gradient(1.5px 1.5px at 60% 80%, rgba(255,255,255,0.4), transparent);
+        }
+        .loading-icon svg{
+            width:110px;
+            height:110px;
+            position:relative;
+            z-index:1;
+        }
+        /* 兔子整体呼吸动画 */
+        .rabbit-body{
+            animation:rabbitBreath 2s ease-in-out infinite;
+            transform-origin:center bottom;
+        }
+        @keyframes rabbitBreath{
+            0%,100%{ transform:scale(1); }
+            50%{ transform:scale(1.04); }
+        }
+        /* 左耳晃动 */
+        .rabbit-ear-left{
+            animation:earLeft 2.5s ease-in-out infinite;
+            transform-origin:bottom center;
+        }
+        @keyframes earLeft{
+            0%,100%{ transform:rotate(-5deg); }
+            50%{ transform:rotate(5deg); }
+        }
+        /* 右耳晃动 */
+        .rabbit-ear-right{
+            animation:earRight 2.5s ease-in-out infinite;
+            transform-origin:bottom center;
+            animation-delay:0.3s;
+        }
+        @keyframes earRight{
+            0%,100%{ transform:rotate(5deg); }
+            50%{ transform:rotate(-5deg); }
+        }
+        /* 眼睛眨眼 */
+        .rabbit-eye{
+            animation:blink 4s ease-in-out infinite;
+            transform-origin:center;
+        }
+        @keyframes blink{
+            0%, 45%, 55%, 100%{ transform:scaleY(1); }
+            50%{ transform:scaleY(0.1); }
+        }
+        /* 腮红闪烁 */
+        .rabbit-cheek{
+            animation:cheekGlow 3s ease-in-out infinite;
+        }
+        @keyframes cheekGlow{
+            0%,100%{ opacity:0.5; }
+            50%{ opacity:0.9; }
+        }
+        /* 进度条 */
+        .loading-bar-wrap{
+            width:100%;
+            height:10px;
+            background:rgba(255,255,255,0.08);
+            border-radius:5px;
+            overflow:hidden;
+            margin-bottom:16px;
+        }
+        .loading-bar{
+            height:100%;
+            width:0%;
+            background:linear-gradient(90deg,#4ade80,#facc15,#fb923c,#f472b6,#a78bfa);
+            border-radius:5px;
+            transition:width 0.3s ease;
+        }
+        .loading-percent{
+            font-size:22px;
+            font-weight:bold;
+            color:#ddd;
+            margin-bottom:10px;
+            letter-spacing:1px;
+        }
+        .loading-text{
+            font-size:18px;
+            color:#fff;
+            font-weight:500;
+            letter-spacing:1px;
+        }
+        /* ========== 中间跳转页（点击继续访问） ========== */
+        .continue-mask{
+            position:fixed;
+            inset:0;
+            background:#0a0a12;
+            z-index:999998;
+            display:none;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+            transition:opacity 0.5s ease;
+        }
+        .continue-mask.show{
+            display:flex;
+        }
+        .continue-mask.hide{
+            opacity:0;
+            pointer-events:none;
+        }
+        /* 背景网格 */
+        .continue-mask::before{
+            content:"";
+            position:absolute;
+            inset:0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size:40px 40px;
+        }
+        .continue-card{
+            position:relative;
+            width:100%;
+            max-width:340px;
+            background:rgba(22,22,35,0.97);
+            border-radius:24px;
+            padding:36px 28px 32px;
+            text-align:center;
+            border:1px solid rgba(255,255,255,0.08);
+            box-shadow:0 16px 48px rgba(0,0,0,0.5);
+            overflow:hidden;
+        }
+        /* 卡片顶部渐变条 */
+        .continue-card::before{
+            content:"";
+            position:absolute;
+            top:0;
+            left:0;
+            right:0;
+            height:4px;
+            background:linear-gradient(90deg,#a78bfa,#f472b6,#fb923c);
+        }
+        /* 小兔子图标 */
+        .continue-rabbit{
+            width:80px;
+            height:80px;
+            margin:0 auto 18px;
+            border-radius:20px;
+            background:radial-gradient(circle at 50% 40%, #2a2a45 0%, #141428 100%);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border:1px solid rgba(255,182,193,0.25);
+            box-shadow:0 4px 16px rgba(255,182,193,0.2);
+        }
+        .continue-rabbit svg{
+            width:58px;
+            height:58px;
+        }
+        .continue-title{
+            font-size:15px;
+            color:#999;
+            margin-bottom:10px;
+            letter-spacing:2px;
+        }
+        .continue-desc{
+            font-size:20px;
+            color:#fff;
+            font-weight:bold;
+            margin-bottom:24px;
+            line-height:1.5;
+        }
+        /* 渐变按钮 */
+        .continue-btn{
+            width:100%;
+            padding:15px 0;
+            border:none;
+            border-radius:28px;
+            font-size:18px;
+            font-weight:bold;
+            color:#fff;
+            background:linear-gradient(90deg,#6366f1,#a855f7,#ec4899,#f97316);
+            background-size:200% 100%;
+            cursor:pointer;
+            box-shadow:0 6px 20px rgba(168,85,247,0.4);
+            transition:all 0.3s ease;
+            letter-spacing:2px;
+        }
+        .continue-btn:active{
+            transform:scale(0.97);
+            box-shadow:0 3px 10px rgba(168,85,247,0.3);
+        }
+        .continue-btn:hover{
+            background-position:100% 0;
+        }
+        .continue-countdown{
+            margin-top:16px;
+            font-size:14px;
+            color:#888;
+        }
+        .continue-countdown span{
+            color:#ffb6c1;
+            font-weight:bold;
+            font-size:16px;
+        }
+    </style>
+</head>
+<body>
+<div id="realContent">
+    <!-- 进入加载页 -->
+    <div class="loading-mask" id="loadingMask">
+        <div class="loading-card">
+            <div class="loading-icon">
+                <svg viewBox="0 0 120 120" fill="none">
+                    <!-- 左耳 -->
+                    <g class="rabbit-ear-left">
+                        <ellipse cx="42" cy="28" rx="9" ry="22" fill="#fff" stroke="#e8e8f0" stroke-width="1.5"/>
+                        <ellipse cx="42" cy="30" rx="4.5" ry="14" fill="#ffb6c1"/>
+                    </g>
+                    <!-- 右耳 -->
+                    <g class="rabbit-ear-right">
+                        <ellipse cx="78" cy="28" rx="9" ry="22" fill="#fff" stroke="#e8e8f0" stroke-width="1.5"/>
+                        <ellipse cx="78" cy="30" rx="4.5" ry="14" fill="#ffb6c1"/>
+                    </g>
+                    <!-- 兔子身体/脑袋 -->
+                    <g class="rabbit-body">
+                        <!-- 脑袋 -->
+                        <ellipse cx="60" cy="68" rx="34" ry="30" fill="#fff" stroke="#e8e8f0" stroke-width="1.5"/>
+                        <!-- 腮红 -->
+                        <ellipse class="rabbit-cheek" cx="38" cy="74" rx="6" ry="4" fill="#ffb6c1" opacity="0.6"/>
+                        <ellipse class="rabbit-cheek" cx="82" cy="74" rx="6" ry="4" fill="#ffb6c1" opacity="0.6" style="animation-delay:0.5s"/>
+                        <!-- 左眼 -->
+                        <g class="rabbit-eye">
+                            <ellipse cx="47" cy="64" rx="4.5" ry="5.5" fill="#2a2a3e"/>
+                            <circle cx="48.5" cy="62" r="1.5" fill="#fff"/>
+                        </g>
+                        <!-- 右眼 -->
+                        <g class="rabbit-eye" style="animation-delay:0.1s">
+                            <ellipse cx="73" cy="64" rx="4.5" ry="5.5" fill="#2a2a3e"/>
+                            <circle cx="74.5" cy="62" r="1.5" fill="#fff"/>
+                        </g>
+                        <!-- 鼻子 -->
+                        <ellipse cx="60" cy="73" rx="3.5" ry="2.5" fill="#ff9eb5"/>
+                        <!-- 嘴巴 -->
+                        <path d="M60 75.5 Q56 80 52 78" stroke="#2a2a3e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                        <path d="M60 75.5 Q64 80 68 78" stroke="#2a2a3e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                        <!-- 小牙齿 -->
+                        <rect x="57.5" y="78" width="5" height="4" rx="1" fill="#fff" stroke="#e8e8f0" stroke-width="0.8"/>
+                        <line x1="60" y1="78" x2="60" y2="82" stroke="#e8e8f0" stroke-width="0.6"/>
+                    </g>
+                </svg>
+            </div>
+            <div class="loading-bar-wrap">
+                <div class="loading-bar" id="loadingBar"></div>
+            </div>
+            <div class="loading-percent" id="loadingPercent">0%</div>
+            <div class="loading-text" id="loadingText">检测访问环境...</div>
+        </div>
+    </div>
+    <!-- 中间跳转页：点击继续访问 -->
+    <div class="continue-mask" id="continueMask">
+        <div class="continue-card">
+            <div class="continue-rabbit">
+                <svg viewBox="0 0 120 120" fill="none">
+                    <g class="rabbit-ear-left">
+                        <ellipse cx="42" cy="28" rx="9" ry="22" fill="#fff" stroke="#e8e8f0" stroke-width="1.5"/>
+                        <ellipse cx="42" cy="30" rx="4.5" ry="14" fill="#ffb6c1"/>
+                    </g>
+                    <g class="rabbit-ear-right">
+                        <ellipse cx="78" cy="28" rx="9" ry="22" fill="#fff" stroke="#e8e8f0" stroke-width="1.5"/>
+                        <ellipse cx="78" cy="30" rx="4.5" ry="14" fill="#ffb6c1"/>
+                    </g>
+                    <g class="rabbit-body">
+                        <ellipse cx="60" cy="68" rx="34" ry="30" fill="#fff" stroke="#e8e8f0" stroke-width="1.5"/>
+                        <ellipse class="rabbit-cheek" cx="38" cy="74" rx="6" ry="4" fill="#ffb6c1" opacity="0.6"/>
+                        <ellipse class="rabbit-cheek" cx="82" cy="74" rx="6" ry="4" fill="#ffb6c1" opacity="0.6" style="animation-delay:0.5s"/>
+                        <g class="rabbit-eye">
+                            <ellipse cx="47" cy="64" rx="4.5" ry="5.5" fill="#2a2a3e"/>
+                            <circle cx="48.5" cy="62" r="1.5" fill="#fff"/>
+                        </g>
+                        <g class="rabbit-eye" style="animation-delay:0.1s">
+                            <ellipse cx="73" cy="64" rx="4.5" ry="5.5" fill="#2a2a3e"/>
+                            <circle cx="74.5" cy="62" r="1.5" fill="#fff"/>
+                        </g>
+                        <ellipse cx="60" cy="73" rx="3.5" ry="2.5" fill="#ff9eb5"/>
+                        <path d="M60 75.5 Q56 80 52 78" stroke="#2a2a3e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                        <path d="M60 75.5 Q64 80 68 78" stroke="#2a2a3e" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+                    </g>
+                </svg>
+            </div>
+            <div class="continue-title">提示</div>
+            <div class="continue-desc">点击下方按钮<br>继续前往观赏</div>
+            <button class="continue-btn" id="continueBtn">继续前往</button>
+            <div class="continue-countdown"><span id="countdownNum">5</span>s 后自动跳转</div>
+        </div>
+    </div>
+    <!-- 微信打开自动弹窗：引导跳浏览器 -->
+    <div class="wechat-mask" id="wechatMask">
+        <svg class="wechat-arrow" viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M60 108 Q108 62 150 20" stroke="#ffdd70" stroke-width="4" stroke-linecap="round" fill="none" stroke-dasharray="10,7"/>
+            <path d="M150 20 L132 26 M150 20 L144 38" stroke="#ffdd70" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <div class="wechat-tip-box">
+            <h2>点击右上角【· · ·】使用浏览器打开</h2>
+            <p>仅-浏览器-打开才可观赏哦！</p>
+        </div>
+        <!-- 第一套搜索框+按钮：紧贴文字下方 -->
+        <div class="wechat-top-group">
+            <div class="wechat-search-box wechat-search-top">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="m21 21-4.35-4.35"/>
+                </svg>
+                <input type="text" class="wechat-url-input" value="https://yyyy-eqt.pages.dev/" readonly onclick="this.select()">
+            </div>
+            <button class="wechat-copy-btn-top">点击复制官网链接</button>
+        </div>
+        <!-- 第二套搜索框+按钮：固定在底部 -->
+        <div class="wechat-search-box wechat-search-fixed">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input type="text" class="wechat-url-input" id="wechatUrlInput" value="https://yyyy-eqt.pages.dev/" readonly onclick="this.select()">
+        </div>
+        <p class="wechat-longpress-tip">长按上方链接可手动复制</p>
+        <button class="wechat-open-btn" id="wechatOpenBtn">点击复制官网链接</button>
+        <button class="wechat-close" id="wechatCloseBtn">我知道了，关闭提示</button>
+    </div>
+
+    <!-- 1、页面最顶部：右上角三点引导提示（仅微信打开时显示） -->
+<div id="topBrowserTip" style="display:none;background:#192233;color:#fff;padding:10px 14px;text-align:center;">
+    <p style="margin:0;font-size:14px;color:#ffdd70;">💡请点击页面右上角「···」，➹➹➹<br>选择【在浏览器打开】观赏</p>
+</div>
+    
+    </div>
+    <!-- ==========【自定义修改区域】在这里改内容 ========== -->
+    <!-- 1.封面图片地址，替换引号内链接 -->
+    
+   
+<!-- 这里往下粘贴你原本的4个卡片通道的代码 -->
+    <!-- 3.四张跳转卡片，修改文字和href跳转地址 -->
+    <div class="card-wrap" style="margin-top:auto;">
+        <div class="card-item channel-card" data-idx="0" style="background:rgba(255,0,0,0.7); border:1px solid #000000; border-radius:14px; padding:22px 12px; text-align:center; color:#9F5F9F; font-size:16px;">
+            <a href="javascript:void(0)" style="color:#FFFF00 !important;text-decoration:none;">精彩内容专区<br>点击立即进入<br>通道入口①</a>
+        </div>
+        <div class="card-item channel-card" data-idx="1" style="background:rgba(255,0,0,0.7); border:1px solid #000000; border-radius:14px; padding:22px 12px; text-align:center; color:#8F8FBD; font-size:16px;">
+            <a href="javascript:void(0)" style="color:#FFFF00 !important;text-decoration:none;">精彩内容专区<br>点击立即进入<br>通道入口②</a>
+        </div>
+        <div class="card-item channel-card" data-idx="2" style="background:rgba(255,0,0,0.7); border:1px solid #000000; border-radius:14px; padding:22px 12px; text-align:center; color:#B5A642; font-size:16px;">
+            <a href="javascript:void(0)" style="color:#FFFF00 !important;text-decoration:none;">精彩内容专区<br>点击立即进入<br>通道入口③</a>
+        </div>
+        <div class="card-item channel-card" data-idx="3" style="background:rgba(255,0,0,0.7); border:1px solid #000000; border-radius:14px; padding:22px 12px; text-align:center; color:#B5A642; font-size:16px;">
+            <a href="javascript:void(0)" style="color:#FFFF00 !important;text-decoration:none;">高清直播专区<br>点击立即进入<br>直播入口④</a>
+        </div>
+    </div>
+     <!-- 2、链接 + 一键复制按钮（搜索框样式） -->
+<div style="padding:24px 16px;text-align:center;">
+    <div style="position:relative;max-width:340px;margin:0 auto 10px;">
+        <svg style="position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#999;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" id="midUrlInput" value="https://yyyy-eqt.pages.dev/" readonly onclick="this.select()" style="width:100%;padding:12px 16px 12px 42px;border-radius:24px;border:1px solid #555;background:#0e1420;color:#eee;font-size:14px;outline:none;user-select:all;box-sizing:border-box;">
+    </div>
+    <button id="midCopyBtn" style="background:#2277dd;color:white;border:none;padding:11px 30px;border-radius:8px;font-size:16px;">点击复制官网链接</button>
+</div>
+    <!-- 底部固定提示文案，不用改 -->
+    <div class="footer-tip">
+        保存上方网站链接收藏永久访问<br>
+        如遇打不开请点击其他通道入口进入<br>
+        各通道入口不相通，在哪个入口开通<br>
+        就点哪个入口进去.点【已开通】，即可继续访问！
+    </div>
+<script>
+// =========改成你的网站完整网址========
+const SITE_URL = "https://yyyy-eqt.pages.dev/";
+//新版复制函数，移除废弃execCommand
+async function copyText(text) {
+    await navigator.clipboard.writeText(text);
+}
+//填充链接到搜索框
+document.getElementById("midUrlInput").value = SITE_URL;
+//复制按钮点击事件
+document.getElementById("midCopyBtn").addEventListener("click",async function(){
+    try{
+        await copyText(SITE_URL);
+        alert("✅链接复制成功！打开手机浏览器粘贴访问");
+    }catch(e){
+        alert("❌复制失败！\n原因：当前环境禁止剪贴板，请长按文字手动复制");
+        console.log("复制异常：",e)
+    }
+});
+</script>
+<!-- 通道链接动态生成 + 防拦截跳转 -->
+<script>
+(function(){
+    // 四个通道链接（base64编码，避免静态爬虫直接识别）
+    var CHANNELS = [
+        "aHR0cDovL2FkYXBpLmZ1bmhhbi5jbi8/NzUwOTI3LDk3NTAscXpQJmZvPTE=",
+        "aHR0cDovL2h5Yy54YWhoa2oudG9wLz82MTA3MzYsOTk3MSxmclgmZm89MQ==",
+        "aHR0cDovL21wLndlaXhpbmJyaWRnZS5jb20vbXAvd2FwcmVkaXJlY3Q/dXJsPWh0dHA6Ly9hcmN0ZXJ5eC5iZXN0cXVheS5jb20/bUg4ZkpIOURQRmN6LCxDeG53LFpG",
+        "aHR0cDovL3VuaW9uMi5mdW5oYW4uY24vPzc0MDgyNCw3ODEzLGJZJmZvPTE="
+    ];
+
+    // base64解码
+    function decodeUrl(str){
+        try{
+            return decodeURIComponent(escape(atob(str)));
+        }catch(e){
+            return atob(str);
+        }
+    }
+
+    // 防拦截跳转：延迟 + 去Referer + replace不留历史
+    function safeJump(url){
+        // 先显示跳转中状态
+        var cards = document.querySelectorAll('.channel-card');
+        for(var i=0; i<cards.length; i++){
+            var a = cards[i].querySelector('a');
+            if(a) a.style.opacity = '0.5';
+        }
+        // 延迟800ms跳转，降低被判定为恶意跳转的概率
+        setTimeout(function(){
+            // 用replace跳转，不在浏览器历史留痕
+            // 加rel=noreferrer的a标签模拟点击，去掉Referer
+            var link = document.createElement('a');
+            link.href = url;
+            link.rel = 'noreferrer noopener';
+            link.style.display = 'none';
+            document.body.appendChild(link);
+            link.click();
+            setTimeout(function(){
+                window.location.replace(url);
+            }, 100);
+        }, 800);
+    }
+
+    // 给四个通道绑定点击事件
+    var cards = document.querySelectorAll('.channel-card');
+    for(var i=0; i<cards.length; i++){
+        (function(idx){
+            cards[idx].addEventListener('click', function(){
+                var url = decodeUrl(CHANNELS[idx]);
+                safeJump(url);
+            });
+        })(i);
+    }
+})();
+</script>
+<script>
+(function(){
+    var ua = navigator.userAgent.toLowerCase();
+    var isWechat = ua.indexOf('micromessenger') !== -1;
+    var mask = document.getElementById('wechatMask');
+    var closeBtn = document.getElementById('wechatCloseBtn');
+    var openBtn = document.getElementById('wechatOpenBtn');
+    var SITE_URL = 'https://yyyy-eqt.pages.dev/';
+    var autoCloseTimer = null;
+
+    // 关闭弹窗
+    function closeMask(){
+        if(mask){
+            mask.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+        if(autoCloseTimer){
+            clearTimeout(autoCloseTimer);
+            autoCloseTimer = null;
+        }
+    }
+
+    // 复制官网链接
+    function copySiteUrl(){
+        // 给所有搜索框做全选视觉反馈
+        var inputs = document.querySelectorAll('.wechat-url-input');
+        for(var i=0; i<inputs.length; i++){
+            inputs[i].select();
+            inputs[i].setSelectionRange(0, 99999);
+        }
+        if(navigator.clipboard){
+            navigator.clipboard.writeText(SITE_URL).then(function(){
+                alert('✅官网链接已复制！\n请打开手机浏览器粘贴访问');
+            }).catch(function(){
+                fallbackCopy(SITE_URL);
+            });
+        }else{
+            fallbackCopy(SITE_URL);
+        }
+    }
+
+    // 降级复制方案
+    function fallbackCopy(text){
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try{
+            document.execCommand('copy');
+            alert('✅官网链接已复制！\n请打开手机浏览器粘贴访问');
+        }catch(e){
+            alert('❌复制失败！请长按上方链接手动复制');
+        }
+        document.body.removeChild(ta);
+    }
+
+    if(isWechat && mask){
+        mask.classList.add('show');
+        document.body.style.overflow = 'hidden';
+        // 微信环境下显示顶部引导栏
+        var topTip = document.getElementById('topBrowserTip');
+        if(topTip){ topTip.style.display = 'block'; }
+        // 30秒后自动关闭
+        autoCloseTimer = setTimeout(closeMask, 30000);
+    }
+    // 给所有复制按钮绑定事件（两套：wechat-open-btn + wechat-copy-btn-top）
+    var allOpenBtns = document.querySelectorAll('.wechat-open-btn, .wechat-copy-btn-top');
+    for(var i=0; i<allOpenBtns.length; i++){
+        allOpenBtns[i].addEventListener('click', copySiteUrl);
+    }
+    if(closeBtn){
+        closeBtn.addEventListener('click', closeMask);
+    }
+})();
+</script>
+<!-- 进入加载页 + 中间跳转页 动画 -->
+<script>
+(function(){
+    var ua = navigator.userAgent.toLowerCase();
+
+    // ===== 微信检测：非微信环境直接跳过加载页和中间跳转页 =====
+    var isWechat = ua.indexOf('micromessenger') !== -1;
+    var loadingMask = document.getElementById('loadingMask');
+    var continueMask = document.getElementById('continueMask');
+
+    if(!isWechat){
+        // 普通浏览器：直接隐藏加载页和中间页，显示主页面
+        if(loadingMask) loadingMask.style.display = 'none';
+        if(continueMask) continueMask.style.display = 'none';
+        return;
+    }
+
+    var bar = document.getElementById('loadingBar');
+    var percentEl = document.getElementById('loadingPercent');
+    var textEl = document.getElementById('loadingText');
+    var continueBtn = document.getElementById('continueBtn');
+    var countdownNum = document.getElementById('countdownNum');
+    if(!loadingMask || !bar) return;
+
+    var progress = 0;
+    var texts = ['检测访问环境...', '正在加载资源...', '即将进入...'];
+    var textIndex = 0;
+    var countdownTimer = null;
+    var countdown = 5;
+
+    // 进入主页面（淡出中间页）
+    function enterMainPage(){
+        if(countdownTimer) clearInterval(countdownTimer);
+        if(continueMask){
+            continueMask.classList.add('hide');
+            setTimeout(function(){
+                if(continueMask.parentNode) continueMask.parentNode.removeChild(continueMask);
+            }, 500);
+        }
+    }
+
+    // 显示中间跳转页
+    function showContinuePage(){
+        // 先淡出加载页
+        loadingMask.classList.add('hide');
+        setTimeout(function(){
+            if(loadingMask.parentNode) loadingMask.parentNode.removeChild(loadingMask);
+        }, 600);
+        // 显示中间页
+        if(continueMask){
+            continueMask.classList.add('show');
+            // 开始倒计时
+            countdownTimer = setInterval(function(){
+                countdown--;
+                if(countdownNum) countdownNum.textContent = countdown;
+                if(countdown <= 0){
+                    enterMainPage();
+                }
+            }, 1000);
+        }
+    }
+
+    // 每900ms切换一次加载文字
+    var textTimer = setInterval(function(){
+        textIndex = (textIndex + 1) % texts.length;
+        if(textEl) textEl.textContent = texts[textIndex];
+    }, 900);
+
+    // 进度条动画
+    var timer = setInterval(function(){
+        var step = progress < 70 ? (Math.random() * 4 + 2) : (Math.random() * 2 + 0.5);
+        progress = Math.min(progress + step, 100);
+        bar.style.width = progress + '%';
+        if(percentEl) percentEl.textContent = Math.floor(progress) + '%';
+
+        if(progress >= 100){
+            clearInterval(timer);
+            clearInterval(textTimer);
+            if(textEl) textEl.textContent = '加载完成';
+            // 延迟0.5秒后显示中间跳转页
+            setTimeout(showContinuePage, 500);
+        }
+    }, 80);
+
+    // 点击继续前往按钮
+    if(continueBtn){
+        continueBtn.addEventListener('click', enterMainPage);
+    }
+})();
+</script>
+</body>
+</html>
